@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #0A1628;
+  font-family: 'PingFang SC', sans-serif;
+  color: #e0e6f0;
+}
+
+.glass-panel {
+  background: rgba(15, 30, 54, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 212, 170, 0.2);
+  border-radius: 12px;
+}
+
+.glow-border {
+  box-shadow: 0 0 20px rgba(0, 212, 170, 0.3), inset 0 0 20px rgba(0, 212, 170, 0.05);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 30, 54, 0.5);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 170, 0.4);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 170, 0.6);
+}
+
+@keyframes alertBlink {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 10px rgba(255, 77, 79, 0.6);
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: 0 0 25px rgba(255, 77, 79, 0.9);
+  }
+}
+
+.alert-blink {
+  animation: alertBlink 0.8s ease-in-out infinite;
+}
+
+@keyframes flow {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.flow-line {
+  background: linear-gradient(90deg, transparent, #00D4AA, transparent);
+  background-size: 200% 100%;
+  animation: flow 2s linear infinite;
+}
+
+.tech-btn {
+  position: relative;
+  background: linear-gradient(135deg, rgba(0, 212, 170, 0.15), rgba(0, 212, 170, 0.05));
+  border: 1px solid rgba(0, 212, 170, 0.4);
+  color: #00D4AA;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.tech-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 170, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.tech-btn:hover {
+  background: linear-gradient(135deg, rgba(0, 212, 170, 0.25), rgba(0, 212, 170, 0.1));
+  border-color: rgba(0, 212, 170, 0.7);
+  box-shadow: 0 0 15px rgba(0, 212, 170, 0.3);
+}
+
+.tech-btn:hover::before {
+  left: 100%;
+}
+
+.tech-btn-primary {
+  background: linear-gradient(135deg, #00D4AA, #00A085);
+  border-color: #00D4AA;
+  color: #0A1628;
+}
+
+.tech-btn-primary:hover {
+  background: linear-gradient(135deg, #00E5BB, #00B090);
+  box-shadow: 0 0 20px rgba(0, 212, 170, 0.5);
+}
+
+.dashboard-number {
+  font-family: 'DIN Alternate', 'PingFang SC', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #00D4AA, #00F5CC);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+}
+
+.dashboard-number-lg {
+  font-size: 48px;
+}
+
+.dashboard-number-sm {
+  font-size: 24px;
+}
