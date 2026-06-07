@@ -94,27 +94,33 @@ export default function DashboardPage() {
     const interval = setInterval(() => {
       const randomElders = [...elders].sort(() => Math.random() - 0.5).slice(0, 3);
       randomElders.forEach((elder) => {
-        const heartRate = 60 + Math.floor(Math.random() * 40);
-        const bloodOxygen = 92 + Math.floor(Math.random() * 8);
+        let heartRate = 60 + Math.floor(Math.random() * 50);
+        let bloodOxygen = 90 + Math.floor(Math.random() * 10);
+
+        if (Math.random() < 0.15) {
+          heartRate = 101 + Math.floor(Math.random() * 30);
+        } else if (Math.random() < 0.1) {
+          bloodOxygen = 85 + Math.floor(Math.random() * 5);
+        }
+
         updateElderVital(elder.id, heartRate, bloodOxygen);
 
-        if (Math.random() < 0.05) {
-          const isHeartCritical = heartRate > 120 || heartRate < 50;
-          const isOxygenLow = bloodOxygen < 93;
-          if (isHeartCritical || isOxygenLow) {
-            triggerAlarm({
-              id: `alarm_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-              type: isHeartCritical ? 'heart_rate' : 'fall',
-              level: isHeartCritical ? 'critical' : 'high',
-              elderId: elder.id,
-              roomId: elder.roomId,
-              timestamp: Date.now(),
-              status: 'pending',
-              message: isHeartCritical
-                ? `${elder.name} 心率异常，当前心率 ${heartRate} 次/分`
-                : `${elder.name} 血氧偏低，当前血氧 ${bloodOxygen}%`,
-            });
-          }
+        const isHeartAbnormal = heartRate > 100 || heartRate < 55;
+        const isOxygenLow = bloodOxygen < 90;
+
+        if (isHeartAbnormal || isOxygenLow) {
+          triggerAlarm({
+            id: `alarm_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+            type: isHeartAbnormal ? 'heart_rate' : 'fall',
+            level: isHeartAbnormal && heartRate > 120 ? 'critical' : 'high',
+            elderId: elder.id,
+            roomId: elder.roomId,
+            timestamp: Date.now(),
+            status: 'pending',
+            message: isHeartAbnormal
+              ? `${elder.name} 心率异常，当前心率 ${heartRate} 次/分`
+              : `${elder.name} 血氧偏低，当前血氧 ${bloodOxygen}%`,
+          });
         }
       });
 
@@ -127,7 +133,7 @@ export default function DashboardPage() {
           });
         }
       });
-    }, 1000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [elders, patrolRobots, updateElderVital, updateRobotPosition, triggerAlarm]);

@@ -106,6 +106,7 @@ export interface Medicine {
   name: string;
   dosage: string;
   remainingDays: number;
+  remainingQuantity: number;
   nextDoseTime: string;
   position: Position3D;
   refillRequested: boolean;

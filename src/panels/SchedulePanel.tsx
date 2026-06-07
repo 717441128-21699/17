@@ -64,31 +64,47 @@ export default function SchedulePanel() {
   };
 
   const handleCellClick = (schedule: Schedule | undefined, date: string, caregiverId: string) => {
-    if (schedule) {
-      setSelectedSchedule(schedule);
-      form.setFieldsValue({
-        targetDate: date,
-        targetShift: schedule.shift,
-        reason: '',
-      });
-      setShiftModalOpen(true);
+    if (!currentUser) {
+      message.warning('请先登录');
+      return;
     }
+    if (currentUser.role === 'caregiver' && currentUser.id !== caregiverId) {
+      message.warning('您只能申请自己的调班');
+      return;
+    }
+    setSelectedSchedule(schedule || null);
+    form.setFieldsValue({
+      targetDate: date,
+      targetShift: schedule ? schedule.shift : 'morning',
+      reason: '',
+    });
+    setShiftModalOpen(true);
   };
 
   const handleSubmitShiftChange = async () => {
     try {
       const values = await form.validateFields();
-      if (!selectedSchedule || !currentUser) return;
+      if (!currentUser) return;
 
-      submitShiftChange({
-        applicantId: currentUser.id,
-        originalScheduleId: selectedSchedule.id,
-        targetDate: values.targetDate,
-        targetShift: values.targetShift,
-        reason: values.reason,
-      });
+      if (selectedSchedule) {
+        submitShiftChange({
+          applicantId: currentUser.id,
+          originalScheduleId: selectedSchedule.id,
+          targetDate: values.targetDate,
+          targetShift: values.targetShift,
+          reason: values.reason,
+        });
+      } else {
+        submitShiftChange({
+          applicantId: currentUser.id,
+          originalScheduleId: `temp_${Date.now()}`,
+          targetDate: values.targetDate,
+          targetShift: values.targetShift,
+          reason: values.reason,
+        });
+      }
 
-      message.success('调班申请已提交');
+      message.success('调班申请已提交，等待护士长审批');
       setShiftModalOpen(false);
       form.resetFields();
     } catch {

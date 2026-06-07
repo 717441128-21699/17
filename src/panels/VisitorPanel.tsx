@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useAppStore } from '../store/useAppStore';
+import { generatePath } from '../utils/pathfinding';
 import type { Visitor } from '../types';
 
 const statusConfig: Record<string, { color: string; label: string }> = {
@@ -38,7 +39,26 @@ export default function VisitorPanel() {
 
   const handleApprove = (visitor: Visitor, approved: boolean) => {
     approveVisitor(visitor.id, approved);
-    message.success(approved ? '已批准访问' : '已拒绝访问');
+    if (approved) {
+      const elder = elders.find((e) => e.id === visitor.visitElderId);
+      if (elder) {
+        const entrance = { x: 2, y: 0, z: -1 };
+        const room = rooms.find((r) => r.id === elder.roomId);
+        const target = room
+          ? { x: room.position.x, y: 0, z: room.position.z }
+          : elder.position;
+        const pathPoints = generatePath(entrance, target, undefined, 30);
+        setVisitorPath({
+          visitorId: visitor.id,
+          from: entrance,
+          to: target,
+          points: pathPoints,
+        });
+      }
+      message.success(`已批准 ${visitor.name} 的访问申请，已生成3D路径指引`);
+    } else {
+      message.success('已拒绝访问');
+    }
   };
 
   const handleGeneratePath = (visitor: Visitor) => {
@@ -47,14 +67,19 @@ export default function VisitorPanel() {
       message.error('未找到老人信息');
       return;
     }
-    const entrance = { x: 0, y: 0, z: 0 };
+    const entrance = { x: 2, y: 0, z: -1 };
+    const room = rooms.find((r) => r.id === elder.roomId);
+    const target = room
+      ? { x: room.position.x, y: 0, z: room.position.z }
+      : elder.position;
+    const pathPoints = generatePath(entrance, target, undefined, 30);
     setVisitorPath({
       visitorId: visitor.id,
       from: entrance,
-      to: elder.position,
-      points: [entrance, elder.position],
+      to: target,
+      points: pathPoints,
     });
-    message.success('已生成访客路径指引');
+    message.success(`已为 ${visitor.name} 生成访客路径指引，请在3D场景中查看青色路径`);
   };
 
   const handleSubmitNew = async () => {

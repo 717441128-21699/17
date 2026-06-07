@@ -374,12 +374,15 @@ export const medicines: Medicine[] = medicineData.map((med, idx) => {
 
   const hour = 6 + Math.floor(Math.random() * 12)
   const minute = [0, 30][Math.floor(Math.random() * 2)]
+  const dailyDose = med.dosage.includes('3次') ? 3 : med.dosage.includes('2次') ? 2 : 1
+  const remainingQuantity = remainingDays * dailyDose + Math.floor(Math.random() * 5)
 
   return {
     id: `medicine_${idx + 1}`,
     name: med.name,
     dosage: med.dosage,
     remainingDays,
+    remainingQuantity,
     nextDoseTime: `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
     position: {
       x: 41 + Math.random() * 4,

@@ -193,14 +193,24 @@ export const useAppStore = create<AppState>((set, get) => ({
   exportDailyReport: (date): DailyReport => {
     const state = get();
 
+    const typeLabels: Record<string, string> = {
+      bedroom: '老人居室',
+      activity: '活动区',
+      nursing: '护理站',
+      dining: '餐厅',
+      pharmacy: '药房',
+      monitor: '监控中心',
+      garden: '户外花园',
+    };
+
     const areaMap = new Map<string, { rooms: Room[] }>();
     state.rooms.forEach((room) => {
-      const areaName = room.area || room.type;
+      const areaName = typeLabels[room.type] || room.type;
       if (!areaMap.has(areaName)) areaMap.set(areaName, { rooms: [] });
       areaMap.get(areaName)!.rooms.push(room);
     });
     const occupancyStats = Array.from(areaMap.entries()).map(([areaName, data]) => {
-      const roomCount = data.rooms.filter((r) => r.type === 'bedroom').length || data.rooms.length;
+      const roomCount = data.rooms.length;
       const occupied = data.rooms.reduce((sum, r) => sum + r.occupancy, 0);
       const capacity = data.rooms.reduce((sum, r) => sum + r.capacity, 0);
       return {
@@ -216,23 +226,25 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (!alarmTypeMap.has(alarm.type)) alarmTypeMap.set(alarm.type, []);
       alarmTypeMap.get(alarm.type)!.push(alarm);
     });
-    const typeLabels: Record<string, string> = {
+    const eventTypeLabels: Record<string, string> = {
       heart_rate: '心率异常',
       fall: '跌倒检测',
       medicine: '用药提醒',
       patrol: '巡更异常',
     };
-    const healthEventStats = Array.from(alarmTypeMap.entries()).map(([type, alarms]) => ({
-      eventType: typeLabels[type] || type,
-      count: alarms.length,
-      resolveRate:
-        alarms.length > 0
-          ? Math.round((alarms.filter((a) => a.status === 'resolved').length / alarms.length) * 100)
-          : 0,
-    }));
+    const allEventTypes = ['heart_rate', 'fall', 'medicine', 'patrol'];
+    const healthEventStats = allEventTypes.map((type) => {
+      const alarmsOfType = alarmTypeMap.get(type) || [];
+      return {
+        eventType: eventTypeLabels[type] || type,
+        count: alarmsOfType.length,
+        resolveRate:
+          alarmsOfType.length > 0
+            ? Math.round((alarmsOfType.filter((a) => a.status === 'resolved').length / alarmsOfType.length) * 100)
+            : 0,
+      };
+    });
 
-    const caregiverMap = new Map<string, User>();
-    state.caregivers.forEach((c) => caregiverMap.set(c.id, c));
     const scheduleStats = state.caregivers.map((cg) => {
       const cgSchedules = state.schedules.filter(
         (s) => s.caregiverId === cg.id && s.date.startsWith(date.slice(0, 7))

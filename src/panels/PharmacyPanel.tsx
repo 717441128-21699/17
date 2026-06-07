@@ -158,34 +158,48 @@ export default function PharmacyPanel() {
                   <div
                     key={med.id}
                     className={`rounded-lg border p-3 transition-all duration-300 hover:scale-[1.02] ${
-                      isLow ? 'alert-blink' : ''
+                      isLow ? 'orange-blink' : ''
                     }`}
                     style={{
                       background: isLow ? 'rgba(250, 173, 20, 0.05)' : 'rgba(0, 212, 170, 0.03)',
-                      borderColor: isLow ? 'rgba(250, 173, 20, 0.3)' : 'rgba(0, 212, 170, 0.15)',
+                      borderColor: isLow ? 'rgba(250, 173, 20, 0.6)' : 'rgba(0, 212, 170, 0.15)',
                     }}
                   >
                     <PillBox3D name={med.name} />
                     <div className="mt-3">
-                      <div className="text-sm font-medium text-white truncate">{med.name}</div>
-                      <div className="text-xs text-[#8C9BB3] mt-0.5">{med.dosage}</div>
+                      <div className="text-sm font-medium text-white truncate" title={med.name}>
+                        💊 {med.name}
+                      </div>
+                      <div className="text-xs text-[#8C9BB3] mt-0.5">剂量: {med.dosage}</div>
                     </div>
 
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center gap-2 text-xs">
-                        {isLow ? (
-                          <Tag color="warning">
-                            <WarningOutlined /> 剩{med.remainingDays}天
-                          </Tag>
-                        ) : (
-                          <Tag color="green">
-                            <CheckCircleOutlined /> 剩{med.remainingDays}天
-                          </Tag>
-                        )}
+                    <div className="mt-2 space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-[#8C9BB3]">剩余量</span>
+                        <span className={isLow ? 'text-warning-orange font-bold' : 'text-white'}>
+                          {med.remainingQuantity} 片
+                        </span>
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-[#8C9BB3]">
-                        <ClockCircleOutlined />
-                        {med.nextDoseTime}
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-[#8C9BB3]">可服天数</span>
+                        <span className={isLow ? 'text-warning-orange font-bold' : 'text-white'}>
+                          {isLow ? (
+                            <Tag color="warning" style={{ margin: 0 }}>
+                              <WarningOutlined /> 剩{med.remainingDays}天
+                            </Tag>
+                          ) : (
+                            <Tag color="green" style={{ margin: 0 }}>
+                              <CheckCircleOutlined /> 剩{med.remainingDays}天
+                            </Tag>
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-[#8C9BB3]">下次服药</span>
+                        <span className="text-white flex items-center gap-1">
+                          <ClockCircleOutlined />
+                          {med.nextDoseTime}
+                        </span>
                       </div>
                     </div>
 
@@ -199,7 +213,7 @@ export default function PharmacyPanel() {
                       disabled={med.refillRequested}
                       style={{ marginTop: 8 }}
                     >
-                      {med.refillRequested ? '已申请补药' : '补药'}
+                      {med.refillRequested ? '已申请补药' : isLow ? '立即补药' : '申请补药'}
                     </Button>
                   </div>
                 );
