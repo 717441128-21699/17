@@ -9,7 +9,8 @@ import type {
   Visitor,
   PatrolRobot,
   MedicationRecord,
-  CareLevel
+  CareLevel,
+  RefillRequest
 } from '../types'
 import { generateVitalSigns, generateVitalHistory, generateHealthScore, generateRandomPosition } from './dataGenerator'
 
@@ -392,6 +393,27 @@ export const medicines: Medicine[] = medicineData.map((med, idx) => {
     refillRequested: remainingDays < 3
   }
 })
+
+export const refillRequests: RefillRequest[] = [
+  {
+    id: 'refill_1',
+    medicineId: 'medicine_1',
+    medicineName: '阿司匹林肠溶片',
+    quantity: 30,
+    requestedBy: 'user_headnurse_1',
+    requestedAt: Date.now() - 3600000,
+    status: 'pending'
+  },
+  {
+    id: 'refill_2',
+    medicineId: 'medicine_2',
+    medicineName: '二甲双胍片',
+    quantity: 60,
+    requestedBy: 'user_headnurse_1',
+    requestedAt: Date.now() - 7200000,
+    status: 'approved'
+  }
+]
 
 export const visitors: Visitor[] = [
   {

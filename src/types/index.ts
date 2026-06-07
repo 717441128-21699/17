@@ -89,6 +89,15 @@ export interface Schedule {
   area: string;
 }
 
+export type ShiftApprovalStatus = 'pending_head' | 'pending_director' | 'approved' | 'rejected';
+
+export const SHIFT_APPROVAL_STATUS = {
+  PENDING_HEAD: 'pending_head' as const,
+  PENDING_DIRECTOR: 'pending_director' as const,
+  APPROVED: 'approved' as const,
+  REJECTED: 'rejected' as const,
+} as const;
+
 export interface ShiftChangeRequest {
   id: string;
   applicantId: string;
@@ -96,7 +105,7 @@ export interface ShiftChangeRequest {
   targetDate: string;
   targetShift: 'morning' | 'afternoon' | 'night';
   reason: string;
-  status: 'pending_head' | 'pending_director' | 'approved' | 'rejected';
+  status: ShiftApprovalStatus;
   headNurseApproved?: boolean;
   directorApproved?: boolean;
 }
@@ -110,6 +119,18 @@ export interface Medicine {
   nextDoseTime: string;
   position: Position3D;
   refillRequested: boolean;
+}
+
+export type RefillStatus = 'pending' | 'approved' | 'rejected' | 'completed';
+
+export interface RefillRequest {
+  id: string;
+  medicineId: string;
+  medicineName: string;
+  quantity: number;
+  requestedBy?: string;
+  requestedAt: number;
+  status: RefillStatus;
 }
 
 export interface Visitor {

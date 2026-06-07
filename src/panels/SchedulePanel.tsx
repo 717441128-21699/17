@@ -10,6 +10,7 @@ import {
 import dayjs from 'dayjs';
 import { useAppStore } from '../store/useAppStore';
 import type { Schedule, ShiftChangeRequest, Role } from '../types';
+import { SHIFT_APPROVAL_STATUS } from '../types';
 
 const shiftConfig: Record<string, { label: string; color: string; bg: string }> = {
   morning: { label: '早班', color: '#FAAD14', bg: 'rgba(250, 173, 20, 0.2)' },
@@ -18,10 +19,10 @@ const shiftConfig: Record<string, { label: string; color: string; bg: string }> 
 };
 
 const statusConfig: Record<string, { color: string; label: string }> = {
-  pending_head: { color: 'gold', label: '待护士长审批' },
-  pending_director: { color: 'blue', label: '待院长审批' },
-  approved: { color: 'green', label: '已批准' },
-  rejected: { color: 'red', label: '已拒绝' },
+  [SHIFT_APPROVAL_STATUS.PENDING_HEAD]: { color: 'gold', label: '待护士长审批' },
+  [SHIFT_APPROVAL_STATUS.PENDING_DIRECTOR]: { color: 'blue', label: '待院长审批' },
+  [SHIFT_APPROVAL_STATUS.APPROVED]: { color: 'green', label: '已批准' },
+  [SHIFT_APPROVAL_STATUS.REJECTED]: { color: 'red', label: '已拒绝' },
 };
 
 const weekDays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
@@ -125,8 +126,8 @@ export default function SchedulePanel() {
 
   const canApprove = (request: ShiftChangeRequest): boolean => {
     if (!currentUser) return false;
-    if (currentUser.role === 'head_nurse' && request.status === 'pending_head') return true;
-    if (currentUser.role === 'director' && request.status === 'pending_director') return true;
+    if (currentUser.role === 'head_nurse' && request.status === SHIFT_APPROVAL_STATUS.PENDING_HEAD) return true;
+    if (currentUser.role === 'director' && request.status === SHIFT_APPROVAL_STATUS.PENDING_DIRECTOR) return true;
     return false;
   };
 

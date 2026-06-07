@@ -94,18 +94,18 @@ export default function DashboardPage() {
     const interval = setInterval(() => {
       const randomElders = [...elders].sort(() => Math.random() - 0.5).slice(0, 3);
       randomElders.forEach((elder) => {
-        let heartRate = 60 + Math.floor(Math.random() * 50);
-        let bloodOxygen = 90 + Math.floor(Math.random() * 10);
+        let heartRate = 65 + Math.floor(Math.random() * 35);
+        let bloodOxygen = 93 + Math.floor(Math.random() * 7);
 
-        if (Math.random() < 0.15) {
-          heartRate = 101 + Math.floor(Math.random() * 30);
-        } else if (Math.random() < 0.1) {
-          bloodOxygen = 85 + Math.floor(Math.random() * 5);
+        if (Math.random() < 0.18) {
+          heartRate = 101 + Math.floor(Math.random() * 35);
+        } else if (Math.random() < 0.12) {
+          bloodOxygen = 82 + Math.floor(Math.random() * 8);
         }
 
         updateElderVital(elder.id, heartRate, bloodOxygen);
 
-        const isHeartAbnormal = heartRate > 100 || heartRate < 55;
+        const isHeartAbnormal = heartRate > 100;
         const isOxygenLow = bloodOxygen < 90;
 
         if (isHeartAbnormal || isOxygenLow) {

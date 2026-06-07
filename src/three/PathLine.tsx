@@ -2,9 +2,10 @@ import { useRef, useMemo, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
+import type { Position3D } from '../types';
 
 interface PathLineProps {
-  points: { x: number; y: number; z: number }[];
+  points: Position3D[];
   color: string;
 }
 

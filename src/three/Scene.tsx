@@ -5,7 +5,7 @@ import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { useAppStore } from '../store/useAppStore';
 import { getEscapePaths, getRescuePaths } from '../utils/pathfinding';
-import type { Room, Bounds3D } from '../types';
+import type { Room } from '../types';
 import Building from './Building';
 import Room3D from './Room3D';
 import Elder3D from './Elder3D';
@@ -13,33 +13,6 @@ import Caregiver3D from './Caregiver3D';
 import Robot3D from './Robot3D';
 import PathLine from './PathLine';
 import MedicineBox3D from './MedicineBox3D';
-
-function getBuildingBounds(rooms: Room[]): Bounds3D {
-  let minX = Infinity,
-    maxX = -Infinity,
-    minZ = Infinity,
-    maxZ = -Infinity;
-  let maxH = 0;
-
-  rooms.forEach((room) => {
-    if (room.type === 'garden') return;
-    const { x, z, w, d, h } = room.position;
-    minX = Math.min(minX, x - w / 2);
-    maxX = Math.max(maxX, x + w / 2);
-    minZ = Math.min(minZ, z - d / 2);
-    maxZ = Math.max(maxZ, z + d / 2);
-    maxH = Math.max(maxH, h);
-  });
-
-  return {
-    x: (minX + maxX) / 2,
-    y: maxH / 2,
-    z: (minZ + maxZ) / 2,
-    w: maxX - minX,
-    h: maxH,
-    d: maxZ - minZ,
-  };
-}
 
 function AlertEffects() {
   const alertRooms = useAppStore((s) => s.rooms.filter((r) => r.isAlerting));
@@ -93,16 +66,14 @@ function SceneContent() {
   const selectedElderId = useAppStore((s) => s.selectedElderId);
   const selectElder = useAppStore((s) => s.selectElder);
 
-  const buildingBounds = useMemo(() => getBuildingBounds(rooms), [rooms]);
-
   const escapePaths = useMemo(
-    () => (evacuationMode ? getEscapePaths(buildingBounds) : []),
-    [evacuationMode, buildingBounds]
+    () => (evacuationMode ? getEscapePaths(rooms) : []),
+    [evacuationMode, rooms]
   );
 
   const rescuePaths = useMemo(
-    () => (evacuationMode ? getRescuePaths(buildingBounds) : []),
-    [evacuationMode, buildingBounds]
+    () => (evacuationMode ? getRescuePaths(rooms) : []),
+    [evacuationMode, rooms]
   );
 
   const caregiverPositions = useMemo(() => {

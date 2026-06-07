@@ -14,7 +14,9 @@ import type {
   Role,
   Position3D,
   DailyReport,
+  RefillRequest,
 } from '../types';
+import { SHIFT_APPROVAL_STATUS } from '../types';
 import {
   users,
   caregivers,
@@ -26,6 +28,7 @@ import {
   visitors,
   patrolRobots,
   rooms,
+  refillRequests as initialRefillRequests,
 } from '../data/mockData';
 
 interface AppState {
@@ -40,6 +43,7 @@ interface AppState {
   schedules: Schedule[];
   shiftChangeRequests: ShiftChangeRequest[];
   medicines: Medicine[];
+  refillRequests: RefillRequest[];
   visitors: Visitor[];
   patrolRobots: PatrolRobot[];
   rooms: Room[];
@@ -58,6 +62,7 @@ interface AppState {
   submitShiftChange: (request: Omit<ShiftChangeRequest, 'id' | 'status'>) => void;
   approveShiftChange: (requestId: string, approverRole: Role, approved: boolean) => void;
   requestRefill: (medicineId: string) => void;
+  approveRefill: (requestId: string, approved: boolean) => void;
   approveVisitor: (visitorId: string, approved: boolean) => void;
   exportDailyReport: (date: string) => DailyReport;
 }
@@ -74,6 +79,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   schedules,
   shiftChangeRequests,
   medicines,
+  refillRequests: initialRefillRequests,
   visitors,
   patrolRobots,
   rooms,
@@ -147,7 +153,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         {
           ...request,
           id: `scr-${Date.now()}`,
-          status: 'pending_head',
+          status: SHIFT_APPROVAL_STATUS.PENDING_HEAD,
         },
         ...s.shiftChangeRequests,
       ],
@@ -158,22 +164,45 @@ export const useAppStore = create<AppState>((set, get) => ({
       shiftChangeRequests: s.shiftChangeRequests.map((r) => {
         if (r.id !== requestId) return r;
         if (!approved) {
-          return { ...r, status: 'rejected' };
+          return { ...r, status: SHIFT_APPROVAL_STATUS.REJECTED };
         }
         if (approverRole === 'head_nurse') {
-          return { ...r, status: 'pending_director', headNurseApproved: true };
+          return { ...r, status: SHIFT_APPROVAL_STATUS.PENDING_DIRECTOR, headNurseApproved: true };
         }
         if (approverRole === 'director') {
-          return { ...r, status: 'approved', directorApproved: true };
+          return { ...r, status: SHIFT_APPROVAL_STATUS.APPROVED, directorApproved: true };
         }
         return r;
       }),
     })),
 
-  requestRefill: (medicineId) =>
+  requestRefill: (medicineId) => {
+    const medicine = get().medicines.find((m) => m.id === medicineId);
+    if (!medicine) return;
+    const currentUser = get().currentUser;
+    const newRequest = {
+      id: `refill_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      medicineId,
+      medicineName: medicine.name,
+      quantity: 30,
+      requestedBy: currentUser?.id,
+      requestedAt: Date.now(),
+      status: 'pending' as const,
+    };
     set((s) => ({
       medicines: s.medicines.map((m) =>
         m.id === medicineId ? { ...m, refillRequested: true } : m
+      ),
+      refillRequests: [newRequest, ...s.refillRequests],
+    }));
+  },
+
+  approveRefill: (requestId, approved) =>
+    set((s) => ({
+      refillRequests: s.refillRequests.map((r) =>
+        r.id === requestId
+          ? { ...r, status: approved ? 'approved' : 'rejected' }
+          : r
       ),
     })),
 
